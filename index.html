@@ -55,11 +55,6 @@ h1{margin:0;font-size:clamp(28px,6vw,46px);font-weight:800}
 .search input{width:100%;padding:11px 16px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;font:500 14px Kanit,sans-serif;outline:none}
 .search input::placeholder{color:#d1fae5}
 .acts .copy{flex:0 0 auto;background:#e2e8f0;color:#334155;padding:10px 12px}
-.card.hasqr{padding-right:96px}
-.qrmini{position:absolute;top:16px;right:14px;width:72px;text-align:center;cursor:pointer;border:0;background:none;padding:0;font-family:inherit}
-.qrmini img{width:72px;height:72px;display:block;border-radius:8px;border:1px solid #e2e8f0;background:#fff;image-rendering:pixelated}
-.qrmini span{font-size:10px;font-weight:700;color:#64748b}
-@media(max-width:420px){.card.hasqr{padding-right:84px}.qrmini,.qrmini img{width:62px}.qrmini img{height:62px}}
 .qrov{position:fixed;inset:0;background:rgba(15,23,42,.75);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px}
 .qrbox{background:#fff;border-radius:18px;padding:18px;max-width:320px;width:100%;text-align:center;color:#0f172a}
 .qrbox img{width:230px;height:230px;image-rendering:pixelated;display:block;margin:6px auto}
@@ -522,7 +517,6 @@ var GPX = (function () {
       if (key === 'LadyLowGross') vc.dataValidation = { type: 'list', allowBlank: true, formulae: ['"TRUE,FALSE"'] };
       if (key === 'Status') vc.dataValidation = { type: 'list', allowBlank: true, formulae: ['"Live,Finished"'] };
       if (key === 'ScoringMode') vc.dataValidation = { type: 'list', allowBlank: true, formulae: ['"STF,S36"'] };
-      if (key === 'GroupBestN') vc.dataValidation = { type: 'whole', operator: 'between', allowBlank: true, formulae: [0, 20], showErrorMessage: true, error: 'ใส่ตัวเลข 0-20 (0 = นับทุกคน)' };
     });
 
     // ---------------- แผ่นงาน 4: รางวัล ----------------
@@ -1101,12 +1095,7 @@ function applyFilter(){
     if(!ev.demo){
       var cp=btn('🔗','copy',function(){copyText(BASE+'?event='+encodeURIComponent(ev.code));cp.textContent='✔';setTimeout(function(){cp.textContent='🔗';},1200);});
       cp.title='คัดลอกลิงก์';a.appendChild(cp);
-      if(window.GPQR){   // v2.3 QR แสดงบนการ์ดเลย (แตะเพื่อขยาย/โหลดรูป)
-        var qm=document.createElement('button');qm.className='qrmini';qm.title='QR Code ของงาน — แตะเพื่อขยาย';
-        var qi=document.createElement('img');qi.alt='QR '+ev.code;qi.src=GPQR.dataUrl(BASE+'?event='+encodeURIComponent(ev.code),3,1);
-        qm.appendChild(qi);qm.appendChild(el('span','','แตะเพื่อขยาย'));qm.onclick=function(){showQr(ev);};
-        card.classList.add('hasqr');card.appendChild(qm);
-      }
+      var qb=btn('▦ QR','copy',function(){showQr(ev);});qb.title='QR Code ของงาน';a.appendChild(qb);
     }
     card.appendChild(a);g.appendChild(card);
   });

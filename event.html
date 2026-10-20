@@ -785,7 +785,6 @@ var GPX = (function () {
       if (key === 'LadyLowGross') vc.dataValidation = { type: 'list', allowBlank: true, formulae: ['"TRUE,FALSE"'] };
       if (key === 'Status') vc.dataValidation = { type: 'list', allowBlank: true, formulae: ['"Live,Finished"'] };
       if (key === 'ScoringMode') vc.dataValidation = { type: 'list', allowBlank: true, formulae: ['"STF,S36"'] };
-      if (key === 'GroupBestN') vc.dataValidation = { type: 'whole', operator: 'between', allowBlank: true, formulae: [0, 20], showErrorMessage: true, error: 'ใส่ตัวเลข 0-20 (0 = นับทุกคน)' };
     });
 
     // ---------------- แผ่นงาน 4: รางวัล ----------------
