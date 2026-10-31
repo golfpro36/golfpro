@@ -397,11 +397,25 @@
     <div id="modal-scorecard" class="fixed inset-0 bg-slate-900/90 z-[200] hidden flex items-center justify-center p-2 sm:p-4 backdrop-blur-sm">
         <div class="bg-white rounded-3xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[95vh]">
             <div id="capture-scorecard" class="p-4 sm:p-6 bg-white overflow-y-auto">
-                <div class="text-center mb-4 border-b border-slate-200 pb-4 relative">
-                    <img id="modal-event-logo" src="" class="h-10 mx-auto mb-2 hidden">
+                <div class="text-center mb-4 border-b border-slate-200 pb-3">
+                    <!-- v2.3.5 หัวสกอร์การ์ด: โลโก้ระบบ (ซ้าย) • โลโก้งาน (กลาง) • QR เว็บหลัก (ขวา) — ติดไปกับรูปที่กด "โหลดรูป" -->
+                    <div id="sc-brand" class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 mb-2">
+                        <div class="flex flex-col items-start leading-none">
+                            <img id="sc-logo" alt="GolfPro36" class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl shadow-sm">
+                            <div class="mt-1 text-[9px] sm:text-[10px] font-black text-slate-700">GolfPro36</div>
+                        </div>
+                        <div class="flex justify-center"><img id="modal-event-logo" src="" class="h-12 sm:h-14 max-w-[110px] object-contain hidden"></div>
+                        <div class="flex flex-col items-end leading-none">
+                            <img id="sc-qr" alt="QR" class="w-14 h-14 sm:w-16 sm:h-16">
+                            <div class="mt-1 text-[8px] text-slate-400 font-bold">สแกนเข้าเว็บไซต์</div>
+                        </div>
+                    </div>
                     <h2 id="modal-tourney-name" class="text-lg sm:text-2xl font-black text-slate-800 uppercase italic">Tournament</h2>
                     <p id="modal-tourney-info" class="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest">Course &bull; Date</p>
-                    <div id="modal-mode-tag" class="absolute top-0 right-0 bg-slate-800 text-white text-[8px] font-black px-2 py-1 rounded">SYS 36 + STF</div>
+                    <div class="mt-1.5 flex items-center justify-center gap-2">
+                        <span id="modal-mode-tag" class="bg-slate-800 text-white text-[8px] font-black px-2 py-0.5 rounded">SYS 36 + STF</span>
+                        <span id="sc-home-text" class="text-[8px] text-slate-400 font-bold"></span>
+                    </div>
                 </div>
 
                 <div class="bg-slate-900 text-white p-4 rounded-2xl mb-4 shadow-lg flex flex-col sm:flex-row justify-between items-center sm:items-end gap-4">
@@ -457,21 +471,6 @@
                                 <tr id="sc-stf-2"><td class="text-purple-600">STF</td></tr>
                             </tbody>
                         </table>
-                    </div>
-                </div>
-                <!-- v2.2 ท้ายสกอร์การ์ด: โลโก้ระบบ + QR ไปหน้าเว็บหลัก (ติดไปกับรูปที่กด "โหลดรูป") -->
-                <div id="sc-brand" class="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-2">
-                        <img id="sc-logo" alt="GolfPro36" class="w-10 h-10 rounded-lg">
-                        <div class="leading-tight">
-                            <div class="font-black text-slate-800 text-sm">GolfPro36</div>
-                            <div class="text-[10px] text-slate-500 font-bold">ผลการแข่งขันออนไลน์ System 36 + Stableford</div>
-                            <div id="sc-home-text" class="text-[9px] text-slate-400 break-all"></div>
-                        </div>
-                    </div>
-                    <div class="text-center shrink-0">
-                        <img id="sc-qr" alt="QR" class="w-20 h-20">
-                        <div class="text-[8px] text-slate-400 font-bold">สแกนเข้าเว็บไซต์</div>
                     </div>
                 </div>
             </div>
@@ -2507,7 +2506,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
         function tieBadge(note, dark) {
             return note ? `<div class="mt-2 text-[11px] font-black rounded-lg px-2 py-1 ${dark ? 'bg-yellow-300 text-slate-900' : 'bg-amber-100 text-amber-800'}"><i class="fa-solid fa-triangle-exclamation"></i> ${esc(note)}</div>` : '';
         }
-        /** v2.2 โลโก้ + QR หน้าเว็บหลักท้ายสกอร์การ์ด */
+        /** โลโก้ + QR หน้าเว็บหลัก บนหัวสกอร์การ์ด (v2.3.5 ย้ายจากท้ายการ์ดขึ้นด้านบน) */
         function fillScorecardBrand() {
             $('#sc-logo').attr('src', GP_LOGO);
             let home = HOME_URL || '';
