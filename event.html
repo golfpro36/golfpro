@@ -39,6 +39,13 @@
         .sc-input { width: 100%; text-align: center; font-weight: bold; background: #fef08a; border: 1px solid #eab308; border-radius: 4px; outline: none; }
         .sc-input { -moz-appearance: textfield; padding: 2px 0; font-size: 14px; }
         .sc-input::-webkit-inner-spin-button, .sc-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .set-card { background:#fff; border-radius:18px; box-shadow:0 1px 3px rgba(15,23,42,.08); padding:14px; margin-bottom:12px; }
+        .set-title { font-weight:900; font-size:15px; color:#0f172a; margin-bottom:2px; }
+        .set-hint { font-size:11px; color:#64748b; margin-bottom:8px; }
+        .set-btn { display:flex; width:100%; align-items:center; justify-content:center; gap:6px; margin-top:10px; border-radius:12px; padding:10px; font-weight:900; font-size:14px; background:#0f172a; color:#fff; }
+        .set-inp { border:1px solid #cbd5e1; border-radius:10px; padding:5px 8px; font-size:14px; background:#fff; }
+        .set-inp:focus { outline:2px solid #16a34a; border-color:#16a34a; }
+        .set-chk { width:20px; height:20px; accent-color:#0f172a; }
         .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
         .step-dot { display:inline-flex; width:26px; height:26px; border-radius:9999px; background:#16a34a; color:#fff; align-items:center; justify-content:center; font-size:13px; font-weight:900; flex:0 0 26px; }
         .stat-box { background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:8px 4px; text-align:center; }
@@ -174,6 +181,7 @@
                 <div class="flex flex-wrap gap-2 items-center">
                     <button id="mode-btn-STF" class="mode-btn" onclick="setViewMode('STF')">System 36 + STF</button>
                     <button id="mode-btn-S36" class="mode-btn" onclick="setViewMode('S36')">System 36 ล้วน</button>
+                    <button id="btn-open-settings" onclick="openSettings()" class="px-3 py-1.5 rounded-full text-[11px] font-black bg-slate-800 text-white"><i class="fa-solid fa-sliders"></i> ตั้งค่างาน (รางวัล • ไฟลท์ • โลโก้)</button>
                     <button id="btn-set-official" onclick="makeViewOfficial()" class="hidden px-3 py-1.5 rounded-full text-[11px] font-black bg-amber-500 text-white"><i class="fa-solid fa-stamp"></i> ตั้งเป็นผลทางการของงาน</button>
                 </div>
             </div>
@@ -261,6 +269,38 @@
         </div>
 
         <!-- 3. FILES VIEW (v2: ดาวน์โหลด / อัปโหลดไฟล์ Excel) -->
+        <!-- v2.4 ตั้งค่างานบนเว็บ (Admin): รางวัล • ไฟลท์ HCP • โลโก้/แบนเนอร์ -->
+        <div id="view-settings" class="tab-content max-w-3xl mx-auto">
+            <div class="flex items-center gap-2 mb-3">
+                <h2 class="text-lg sm:text-xl font-black text-slate-800"><i class="fa-solid fa-sliders text-green-600"></i> ตั้งค่างาน (Admin)</h2>
+                <button onclick="switchTab('leaderboard')" class="ml-auto px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-xs font-black text-slate-600"><i class="fa-solid fa-arrow-left"></i> กลับ</button>
+            </div>
+            <div class="set-card">
+                <div class="set-title"><i class="fa-solid fa-trophy text-yellow-500"></i> รางวัลที่คำนวณอัตโนมัติ</div>
+                <p class="set-hint">ติ๊กรางวัลที่งานนี้มีจริง — หน้า "รางวัล" และ "สรุปรางวัล" แสดงตามนี้ทันที • 1 คน 1 รางวัล (ผู้ได้รางวัลใหญ่ถูกข้ามในรางวัลถัดไป) • ค่าเดียวกับแผ่นงาน "รางวัล" ในไฟล์ Excel</p>
+                <div id="set-awards" class="divide-y text-sm"></div>
+                <button id="set-awards-save" class="set-btn"><i class="fa-solid fa-floppy-disk"></i> บันทึกการตั้งค่ารางวัล</button>
+            </div>
+            <div class="set-card">
+                <div class="set-title"><i class="fa-solid fa-hand-holding-heart text-yellow-500"></i> รางวัลกรอกมือ (Nearest to the Pin / Long Drive / จับฉลาก / อื่น ๆ)</div>
+                <p class="set-hint">ตั้งหลุม NTP / Long Drive / จำนวนจับฉลาก ในตารางด้านบน แล้วกรอกชื่อผู้ได้รับที่นี่</p>
+                <div id="set-manual-list" class="text-sm divide-y mb-2"></div>
+                <button onclick="editManualAwards()" class="set-btn !bg-white !text-slate-800 border border-slate-300"><i class="fa-solid fa-pen"></i> กรอก / แก้ชื่อผู้ได้รับรางวัลพิเศษ</button>
+            </div>
+            <div class="set-card">
+                <div class="flex items-center gap-2"><div class="set-title"><i class="fa-solid fa-layer-group text-yellow-500"></i> ไฟลท์ตาม HCP (Class)</div>
+                    <button id="set-class-add" class="ml-auto px-2 py-1 rounded-lg bg-white border border-slate-300 text-xs font-black"><i class="fa-solid fa-plus"></i> เพิ่มไฟลท์</button></div>
+                <p class="set-hint">จัด Class อัตโนมัติจาก HCP System 36 — แถวแรกที่ HCP ≤ สูงสุด, แถวสุดท้ายนับเป็น "ขึ้นไป" • ผู้หญิงแยก Flight LADY อัตโนมัติ (ชื่อ LADY สงวนไว้)</p>
+                <div class="overflow-x-auto"><table class="w-full text-sm" id="set-classes"></table></div>
+                <button id="set-class-save" class="set-btn"><i class="fa-solid fa-floppy-disk"></i> บันทึกไฟลท์</button>
+            </div>
+            <div class="set-card">
+                <div class="set-title"><i class="fa-regular fa-image text-yellow-500"></i> โลโก้และแบนเนอร์งาน</div>
+                <p class="set-hint">อัปโหลดรูปจากเครื่อง (ระบบย่อขนาดให้ เก็บในโฟลเดอร์งานบน Drive) — แสดงบนหน้า Leaderboard สกอร์การ์ด และจอ TV</p>
+                <div class="grid sm:grid-cols-2 gap-3" id="set-images"></div>
+            </div>
+        </div>
+
         <div id="view-files" class="tab-content max-w-2xl mx-auto">
             <div class="bg-green-700 text-white p-5 rounded-2xl shadow-lg mb-4 text-center border-4 border-green-300 relative overflow-hidden">
                 <i class="fa-solid fa-file-excel text-green-300 absolute -right-3 -bottom-4 text-8xl opacity-30"></i>
@@ -1400,6 +1440,8 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
                 }
                 if(eventImages && /^(https?:|data:image\/)/i.test(eventImages.EventLogo || '')) $('#event-logo, #tv-event-logo, #modal-event-logo').attr('src', eventImages.EventLogo).removeClass('hidden');
                 if(eventImages && /^(https?:|data:image\/)/i.test(eventImages.BannerLogo || '')) $('#banner-logo').attr('src', eventImages.BannerLogo).parent().removeClass('hidden');
+                if(eventImages && eventImages.EventLogo === '') $('#event-logo, #tv-event-logo, #modal-event-logo').addClass('hidden');   // v2.4 ลบโลโก้จากหน้าตั้งค่า
+                if(eventImages && eventImages.BannerLogo === '') $('#banner-container').addClass('hidden');
 
                 let statusBadge = $('#tourney-status-badge');
                 let tvStatusBadge = $('#tv-status-badge');
@@ -2558,9 +2600,117 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
                         }).withFailureHandler(e => { Swal.showValidationMessage((e && e.message) || 'เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ'); resolve(false); })
                           .saveManualAwards(EVENT_CODE, adminPinOk, list);
                     })
-                }).then(r => { if (r.isConfirmed) { rerenderAll(); Swal.fire({ toast: true, position: 'top', icon: 'success', title: 'บันทึกรางวัลพิเศษแล้ว', showConfirmButton: false, timer: 1600 }); } });
+                }).then(r => { if (r.isConfirmed) { rerenderAll(); if ($('#view-settings').hasClass('active')) renderSettingsView(); Swal.fire({ toast: true, position: 'top', icon: 'success', title: 'บันทึกรางวัลพิเศษแล้ว', showConfirmButton: false, timer: 1600 }); } });
             });
         }
+        // ================================================================
+        //  v2.4 ตั้งค่างานบนเว็บ (Admin): รางวัล • ไฟลท์ HCP • โลโก้/แบนเนอร์
+        // ================================================================
+        function openSettings() {
+            if (EVENT_CODE === 'DEMO') { Swal.fire('งานตัวอย่าง', 'งานตัวอย่างไม่บันทึกข้อมูล — สร้างงานทดลองใช้ฟรีที่หน้าแรกเพื่อลองตั้งค่า', 'info'); return; }
+            askAdminPin(() => { switchTab('settings'); renderSettingsView(); });
+        }
+        const SET_AWARDS = [
+            ['h', 'Overall'], ['b', 'OverallLowGross', 'Overall Low Gross'], ['b', 'OverallLowNet', 'Overall Low Net'],
+            ['b', 'Overall_IncludeLady', 'Overall รวมผู้หญิงด้วย (ปิด = ผู้หญิงชิงในไฟลท์ LADY)'], ['b', 'OverallStableford', 'Stableford รวมสูงสุด (เฉพาะระบบ STF)'],
+            ['h', 'ไฟลท์ (Class)'], ['b', 'FlightA_LowGross', 'Flight A Low Gross'], ['b', 'FlightA_LowNet', 'Flight A Low Net'], ['b', 'FlightB_LowGross', 'Flight B Low Gross'], ['b', 'FlightB_LowNet', 'Flight B Low Net'],
+            ['b', 'FlightC_LowGross', 'Flight C Low Gross'], ['b', 'FlightC_LowNet', 'Flight C Low Net'], ['b', 'FlightD_LowGross', 'Flight D Low Gross'], ['b', 'FlightD_LowNet', 'Flight D Low Net'],
+            ['e', 'Lady_LowGross', 'Flight LADY Low Gross', [['', 'ตามค่า LadyLowGross (แท็บ Tournament)'], ['TRUE', 'มีรางวัล'], ['FALSE', 'ไม่มี']]], ['b', 'Lady_LowNet', 'Flight LADY Low Net'],
+            ['h', 'รางวัลอื่น'], ['b', 'BoobyPrize', 'Booby Prize'],
+            ['e', 'Booby_Scope', 'Booby: ผู้มีสิทธิ์', [['ALL', 'รวมทุกคน'], ['MEN', 'เฉพาะชาย'], ['LADY', 'เฉพาะหญิง'], ['SEPARATE', 'แยกชาย-หญิง']]],
+            ['e', 'Booby_Rule', 'Booby: ใคร', [['2ND', 'รองบ๊วย'], ['LAST', 'บ๊วย']]],
+            ['b', 'MostBirdies', 'Most Birdies'], ['b', 'MostPars', 'Most Pars'],
+            ['h', 'รางวัลทีม'], ['t', 'TeamType', 'จำนวนรางวัลทีมตามประเภทผู้เล่น'], ['n', 'TeamLowGross_AwardCount', 'ทีม Low Gross: จำนวนรางวัล'], ['n', 'TeamLowNet_AwardCount', 'ทีม Low Net: จำนวนรางวัล'],
+            ['h', 'รางวัลกรอกมือ'], ['s', 'NearestToPin', 'Nearest to the Pin: หลุม (เช่น 3,7,12,16)'],
+            ['e', 'LongestDrive', 'Longest Drive', [['NONE', 'ไม่มี'], ['ALL', '1 รางวัล'], ['SEPARATE', 'แยกชาย-หญิง']]],
+            ['b', 'LongestPutt', 'Longest Putt'], ['b', 'SpiritAward', 'รางวัลน้ำใจนักกีฬา'], ['n', 'LuckyDraw_AwardCount', 'Lucky Draw: จำนวนรางวัล (0-50)']];
+        function teamTypesForSettings() {
+            let cfg = appData.awardsConfig || {}, ttc = cfg.TeamTypeCounts || {}, set = [];
+            (appData.players || []).forEach(p => { let t = String(p.type || '').trim() || 'ทั่วไป'; if (t !== 'ไม่สังกัดทีม' && set.indexOf(t) < 0) set.push(t); });
+            Object.keys(ttc).forEach(t => { if (set.indexOf(t) < 0) set.push(t); });
+            if (!set.length) set = ['VIP', 'ทั่วไป'];
+            return set.map(t => ({ type: t, n: ttc[t] != null ? ttc[t] : (t === 'VIP' ? (cfg.TeamVIP_AwardCount != null ? cfg.TeamVIP_AwardCount : 3) : (cfg.TeamGeneral_AwardCount != null ? cfg.TeamGeneral_AwardCount : 3)) }));
+        }
+        function renderSettingsView() {
+            let a = appData.awardsConfig || {};
+            $('#set-awards').html(SET_AWARDS.map(u => {
+                if (u[0] === 'h') return `<div class="pt-3 pb-1 font-black text-[11px] text-slate-500 uppercase">${u[1]}</div>`;
+                let k = u[1], v = a[k];
+                if (u[0] === 'b') return `<label class="py-1.5 flex items-center gap-3 cursor-pointer"><input type="checkbox" class="set-chk" data-awb="${k}" ${v === true ? 'checked' : ''}><span class="font-bold">${u[2]}</span></label>`;
+                if (u[0] === 'e') return `<div class="py-1.5 flex items-center gap-2"><span class="font-bold flex-1 pl-8">${u[2]}</span><select class="set-inp w-48" data-awv="${k}">${u[3].map(o => `<option value="${o[0]}" ${String(v == null ? '' : v).toUpperCase() === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select></div>`;
+                if (u[0] === 'n') return `<div class="py-1.5 flex items-center gap-2"><span class="font-bold flex-1 pl-8">${u[2]}</span><input class="set-inp w-20 text-center" inputmode="numeric" data-awv="${k}" value="${esc(v == null ? 0 : v)}"></div>`;
+                if (u[0] === 's') return `<div class="py-1.5 flex items-center gap-2"><span class="font-bold flex-1 pl-8">${u[2]}</span><input class="set-inp w-48" data-awv="${k}" value="${esc(v || '')}" placeholder="ว่าง = ไม่มี"></div>`;
+                return `<div class="py-1.5"><div class="font-bold pl-8 mb-1">${u[2]} <span class="text-[11px] font-normal text-slate-500">(ตามคอลัมน์ "ประเภท" ของผู้เล่น — 0 = ไม่มีรางวัล)</span></div>` +
+                    teamTypesForSettings().map(x => `<div class="flex items-center gap-2 pl-8 py-0.5"><span class="flex-1">ทีมประเภท <b>${esc(x.type)}</b></span><input class="set-inp w-20 text-center" inputmode="numeric" data-awt="${esc(x.type)}" value="${esc(x.n)}"></div>`).join('') + '</div>';
+            }).join(''));
+            let rows = getManualAwardRows();
+            $('#set-manual-list').html(rows.length ? rows.map(r => `<div class="py-1.5 flex gap-2"><span class="font-bold flex-1">${esc(r.award)}</span><span>${r.winner ? esc(r.winner) : '<span class="text-slate-300">ยังไม่กรอก</span>'}</span><span class="text-xs text-slate-500 w-24 text-right">${esc(r.note || '')}</span></div>`).join('') : '<div class="text-xs text-slate-400 py-1">ยังไม่มีรางวัลกรอกมือ</div>');
+            renderClassRows((appData.classConfig && appData.classConfig.length ? appData.classConfig : DEFAULT_CLASS_CONFIG).map(c => ({ key: c.key, label: c.label, min: c.min, max: c.max, enabled: true })));
+            renderImageCards();
+        }
+        function renderClassRows(list) {
+            $('#set-classes').html('<tr class="text-[11px] text-slate-500 text-left"><th>ชื่อย่อ</th><th>ชื่อที่แสดง</th><th>HCP ต่ำสุด</th><th>HCP สูงสุด</th><th>ใช้</th><th></th></tr>' + list.map((c, i) => `<tr class="border-t" data-cls="${i}">
+                <td class="py-1 pr-1"><input class="set-inp w-16 uppercase" data-c="key" maxlength="10" value="${esc(c.key)}"></td><td class="pr-1"><input class="set-inp w-full" data-c="label" maxlength="30" value="${esc(c.label)}"></td>
+                <td class="pr-1"><input class="set-inp w-20" data-c="min" inputmode="decimal" value="${esc(c.min)}"></td><td class="pr-1"><input class="set-inp w-20" data-c="max" inputmode="decimal" value="${esc(c.max >= 999 ? '' : c.max)}" placeholder="ขึ้นไป"></td>
+                <td><input type="checkbox" class="set-chk" data-c="enabled" ${c.enabled !== false ? 'checked' : ''}></td><td><button class="px-2 py-1 rounded-lg border border-slate-300 text-xs" onclick="removeClassRow(${i})"><i class="fa-solid fa-xmark"></i></button></td></tr>`).join(''));
+        }
+        function readClassRows() { return $('#set-classes [data-cls]').toArray().map(tr => ({ key: $(tr).find('[data-c=key]').val().trim().toUpperCase(), label: $(tr).find('[data-c=label]').val(), min: $(tr).find('[data-c=min]').val(), max: $(tr).find('[data-c=max]').val(), enabled: $(tr).find('[data-c=enabled]').prop('checked') })); }
+        function removeClassRow(i) { let l = readClassRows(); l.splice(i, 1); renderClassRows(l); }
+        function renderImageCards() {
+            eventImages = eventImages || {};
+            let label = { EventLogo: 'โลโก้งาน (สี่เหลี่ยมจัตุรัส)', BannerLogo: 'แบนเนอร์งาน (แนวนอน 3:1)' };
+            $('#set-images').html(['EventLogo', 'BannerLogo'].map(k => `<div class="rounded-xl border p-2">
+                <div class="text-xs font-bold text-slate-600 mb-1">${label[k]}</div>
+                <div class="h-24 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden mb-2">${eventImages[k] ? `<img class="max-h-24 max-w-full object-contain" src="${esc(eventImages[k])}">` : '<span class="text-xs text-slate-400">ยังไม่มีรูป</span>'}</div>
+                <div class="flex gap-1"><label class="flex-1 cursor-pointer rounded-lg bg-slate-900 text-white text-xs font-black py-2 text-center"><i class="fa-solid fa-upload"></i> อัปโหลดรูป<input type="file" accept="image/*" class="hidden" data-upimg="${k}"></label>
+                ${eventImages[k] ? `<button class="px-3 rounded-lg border border-slate-300 text-xs" data-rmimg="${k}"><i class="fa-solid fa-trash"></i></button>` : ''}</div></div>`).join(''));
+            $('#set-images [data-upimg]').on('change', function () { uploadSettingImage($(this).data('upimg'), this.files[0]); });
+            $('#set-images [data-rmimg]').on('click', function () { let k = $(this).data('rmimg'); Swal.fire({ icon: 'question', title: 'ลบรูปนี้?', showCancelButton: true, confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก' }).then(x => x.isConfirmed && settingCall('uploadEventImage', [k, '', ''], () => { eventImages[k] = ''; updateUIInfo(); renderImageCards(); })); });
+        }
+        /** เรียกเซิร์ฟเวอร์ด้วยรหัส Admin + แสดงสถานะ */
+        function settingCall(fn, args, done) {
+            Swal.fire({ title: 'กำลังบันทึก…', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            google.script.run.withSuccessHandler(r => {
+                if (!r || r.status !== 'success') { if (r && /รหัส/.test(r.message || '')) adminPinOk = ''; Swal.fire('บันทึกไม่สำเร็จ', (r && r.message) || 'ลองใหม่อีกครั้ง', 'error'); return; }
+                Swal.fire({ toast: true, position: 'top', icon: 'success', title: r.message || 'บันทึกแล้ว', showConfirmButton: false, timer: 2200 });
+                if (r.warnings && r.warnings.length) Swal.fire({ icon: 'info', title: 'บันทึกแล้ว — ข้อสังเกต', html: r.warnings.map(w => '• ' + esc(w)).join('<br>') });
+                done(r);
+            }).withFailureHandler(e => Swal.fire('เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ', (e && e.message) || '', 'error'))[fn].apply(null, [EVENT_CODE, adminPinOk].concat(args));
+        }
+        function saveSettingAwards() {
+            let m = {};
+            $('#set-awards [data-awb]').each(function () { m[$(this).data('awb')] = $(this).prop('checked') ? 'TRUE' : 'FALSE'; });
+            $('#set-awards [data-awv]').each(function () { m[$(this).data('awv')] = $(this).val(); });
+            let ttc = {}; $('#set-awards [data-awt]').each(function () { ttc[String($(this).data('awt'))] = $(this).val(); });
+            m.TeamTypeCounts = ttc;
+            if (m.Lady_LowGross === '') delete m.Lady_LowGross;
+            settingCall('saveAwardsConfig', [m], r => { appData.awardsConfig = r.awardsConfig; rerenderAll(); renderSettingsView(); });
+        }
+        function shrinkImage(file, kind) {
+            return new Promise((ok, no) => {
+                if (!file || !/^image\//.test(file.type)) return no(new Error('เลือกไฟล์รูปภาพ'));
+                let fr = new FileReader();
+                fr.onload = () => { let img = new Image(); img.onload = () => {
+                    let max = kind === 'EventLogo' ? 512 : 1600, k = Math.min(1, max / Math.max(img.width, img.height));
+                    let c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+                    let g = c.getContext('2d'); if (kind !== 'EventLogo') { g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); }
+                    g.drawImage(img, 0, 0, c.width, c.height);
+                    ok(kind === 'EventLogo' ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', 0.85));
+                }; img.onerror = () => no(new Error('อ่านรูปไม่ได้')); img.src = fr.result; };
+                fr.onerror = () => no(new Error('อ่านไฟล์ไม่ได้')); fr.readAsDataURL(file);
+            });
+        }
+        function uploadSettingImage(kind, file) {
+            shrinkImage(file, kind).then(d => settingCall('uploadEventImage', [kind, d, file.name], () => {
+                eventImages = eventImages || {}; eventImages[kind] = d; appData.tournament.HasLogo = true; updateUIInfo(); renderImageCards();
+            })).catch(e => Swal.fire('อัปโหลดไม่สำเร็จ', e.message, 'error'));
+        }
+        $(function () {
+            $('#set-awards-save').on('click', saveSettingAwards);
+            $('#set-class-add').on('click', () => { let l = readClassRows(), last = l[l.length - 1], k = String.fromCharCode(65 + Math.min(l.length, 25)); l.push({ key: k, label: 'Flight ' + k, min: last ? (Number(last.max) || Number(last.min)) + 1 : 0, max: '', enabled: true }); renderClassRows(l); });
+            $('#set-class-save').on('click', () => settingCall('saveClassConfig', [readClassRows()], r => { appData.classConfig = r.classConfig; rerenderAll(); renderSettingsView(); }));
+        });
+
         function createAwardCard(title, player, bgClass, highlightClass, note) {
             return `
                 <div class="rounded-2xl p-5 ${bgClass} shadow-xl cursor-pointer hover:scale-[1.02] transition-transform" onclick="openScorecardModal('${player.id}')">
