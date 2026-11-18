@@ -10,13 +10,19 @@
       return Promise.reject(new Error('ยังไม่ได้ตั้งค่า config.js — วางลิงก์ Web App ของ Apps Script (ลงท้ายด้วย /exec)'));
     }
     // มือถือ (โดยเฉพาะ iPhone) ตัดการเชื่อมต่อบ่อยตอนสัญญาณอ่อน/สลับแอป → คำสั่ง "อ่านอย่างเดียว" ลองใหม่อัตโนมัติ 2 ครั้ง
-    var tries = READ_ONLY.indexOf(fn) >= 0 ? 3 : 1;
+    // v2.4.1: ลองใหม่ 1 ครั้ง (เว้นช่วงสุ่ม 1.5-3 วินาที กันทุกเครื่องยิงพร้อมกันตอนระบบหนัก) + ตัดคำขอที่ค้างเกิน 45 วินาที
+    var tries = READ_ONLY.indexOf(fn) >= 0 ? 2 : 1;
     function once(n) {
+      var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      var timer = ctl ? setTimeout(function () { ctl.abort(); }, 45000) : null;
       return fetch(api, { method: 'POST', redirect: 'follow', cache: 'no-store', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ fn: fn, args: args }) })
+        body: JSON.stringify({ fn: fn, args: args }), signal: ctl ? ctl.signal : undefined })
         .then(function (r) { if (!r.ok) throw new Error('เซิร์ฟเวอร์ตอบกลับผิดปกติ (' + r.status + ')'); return r.json(); })
+        .then(function (o) { if (timer) clearTimeout(timer); if (o && o.sv) { try { window.dispatchEvent(new CustomEvent('gp-sv', { detail: o.sv })); } catch (x) {} } return o; })
         .catch(function (e) {
-          if (n > 1) return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return once(n - 1); });
+          if (timer) clearTimeout(timer);
+          if (e && e.name === 'AbortError') e = new Error('เซิร์ฟเวอร์ตอบช้าเกินไป — ลองใหม่อีกครั้ง');
+          if (n > 1) return new Promise(function (ok) { setTimeout(ok, 1500 + Math.random() * 1500); }).then(function () { return once(n - 1); });
           throw e;
         });
     }

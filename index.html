@@ -138,7 +138,7 @@ h1{margin:0;font-size:clamp(28px,6vw,46px);font-weight:800}
 <div class="sec">🏌️ งานแข่งขันที่เปิดให้ชม <small>คลิกเพื่อดูอันดับ หรืออัปโหลดไฟล์คะแนน</small></div>
 <div class="search"><input id="search" placeholder="🔎 ค้นหาชื่องาน / ชื่อลูกค้า..."></div>
 <div class="grid" id="grid"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
-<div class="foot">GolfPro System 36 + Stableford v2 • งานที่ไม่ได้เปิดสาธารณะเข้าได้ด้วยรหัสงานเท่านั้น</div>
+<div class="foot">GolfPro System 36 + Stableford v2.4.1 • งานที่ไม่ได้เปิดสาธารณะเข้าได้ด้วยรหัสงานเท่านั้น • <a href="#" id="btn-privacy" style="color:inherit;text-decoration:underline">ความเป็นส่วนตัวและการลบข้อมูล</a></div>
 </div>
 
 <!-- MODAL: สร้างงานใหม่ -->
@@ -259,6 +259,21 @@ h1{margin:0;font-size:clamp(28px,6vw,46px);font-weight:800}
   <div class="modalbtns"><button class="btn ghost" id="contact-close" style="flex:1">ปิด</button></div>
 </div></div>
 
+<!-- MODAL: ความเป็นส่วนตัว (v2.4.1) -->
+<div class="ovl" id="ovl-privacy"><div class="modal" style="max-width:560px">
+  <h3>🔒 ประกาศความเป็นส่วนตัว</h3>
+  <div style="font-size:13px;line-height:1.65;color:#334155">
+    <p><b>ข้อมูลที่ระบบเก็บ:</b> ชื่อผู้เล่น เพศ ก๊วน ประเภท แต้มต่อ และคะแนนรายหลุม ที่ผู้จัดงานกรอกหรืออัปโหลด • อีเมลผู้จัดงาน (ถ้าขอให้แชร์ชีต) • ไฟล์ Excel และรูปโลโก้ที่อัปโหลด</p>
+    <p><b>ใช้เพื่อ:</b> คำนวณแต้มต่อ อันดับ และรางวัล แล้วแสดงผลการแข่งขันของงานนั้นเท่านั้น ไม่ขายหรือส่งต่อข้อมูลให้บุคคลอื่น</p>
+    <p><b>ใครเห็นได้:</b> ผลการแข่งขัน (ชื่อผู้เล่นและคะแนน) เปิดดูได้ทุกคนที่มีลิงก์หรือรหัสงาน • งานที่ตั้งเป็นสาธารณะจะแสดงในหน้าแรก • การแก้ไขต้องใช้รหัสของงาน</p>
+    <p><b>เก็บที่ไหน:</b> Google Sheets / Google Drive ของผู้ให้บริการ GolfPro36</p>
+    <p><b>เก็บนานเท่าไร:</b> งานทดลองใช้ลบอัตโนมัติหลัง 3 วัน • งานจริงลบตามนโยบายของผู้ให้บริการ หรือเมื่อผู้จัดงานร้องขอ</p>
+    <p><b>ขอดู แก้ไข หรือลบข้อมูล:</b> ผู้เล่นติดต่อผู้จัดงาน หรือติดต่อผู้ให้บริการผ่านปุ่ม "ติดต่อผู้ดูแล"</p>
+    <p class="hint">ผู้จัดงานเป็นผู้รับผิดชอบการขอความยินยอมจากผู้เล่นตามกฎหมายคุ้มครองข้อมูลส่วนบุคคล (PDPA) • GolfPro36 ประมวลผลข้อมูลตามที่ผู้จัดงานมอบหมาย</p>
+  </div>
+  <div class="modalbtns"><button class="btn ghost" id="privacy-close" style="flex:1">ปิด</button></div>
+</div></div>
+
 <script>
 /**
  * ============================================================
@@ -298,6 +313,7 @@ var GPX = (function () {
     ['BoobyPrize', 'bool', 'Booby Prize — เปิด/ปิด'],
     ['Booby_Scope', 'enum', 'Booby: ALL = รวมทุกคน / MEN = เฉพาะชาย (ห้ามหญิง) / LADY = เฉพาะหญิง / SEPARATE = แยกชาย-หญิง', 'ALL', ['ALL', 'MEN', 'LADY', 'SEPARATE']],
     ['Booby_Rule', 'enum', 'Booby: 2ND = รองบ๊วย (Gross สูงอันดับ 2) / LAST = บ๊วย (Gross สูงสุด)', '2ND', ['2ND', 'LAST']],
+    ['Booby_Priority', 'enum', 'คนได้ Booby ที่ติดอันดับ 1-3 ไฟลท์: FLIGHT = ได้รางวัลไฟลท์ แล้ว Booby ไปคนถัดไป / BOOBY = ได้ Booby (เสียอันดับไฟลท์)', 'BOOBY', ['BOOBY', 'FLIGHT']],
     ['Overall_IncludeLady', 'bool', 'TRUE = Overall Low Gross/Net รวมผู้หญิงด้วย / FALSE = ไม่รวม (แบบเดิม)', 'FALSE'],
     ['OverallStableford', 'bool', 'Stableford รวมสูงสุด (เฉพาะระบบ STF)', 'FALSE'],
     ['FlightA_LowGross', 'bool', 'Flight A — Low Gross'], ['FlightA_LowNet', 'bool', 'Flight A — Low Net'],
@@ -1121,6 +1137,7 @@ google.script.run.withSuccessHandler(render).withFailureHandler(function(){rende
 
 // ---- สร้างงานใหม่ ----
 function showOvl(id){document.getElementById(id).classList.add('show');}
+document.addEventListener('click',function(e){if(e.target&&e.target.id==='btn-privacy'){e.preventDefault();showOvl('ovl-privacy');}if(e.target&&e.target.id==='privacy-close')document.getElementById('ovl-privacy').classList.remove('show');});
 function hideOvl(id){document.getElementById(id).classList.remove('show');}
 
 // ---- เอฟเฟกต์ "กำลังสร้างงาน/โหลดข้อมูล" (ลูกกอล์ฟกระดอนเข้าหลุม) — แสดง "ในกล่อง" โมดัลเดิม ไม่ออกจากหน้าหลัก ----
